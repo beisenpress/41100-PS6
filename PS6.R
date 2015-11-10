@@ -20,5 +20,45 @@ setwd("/Users/ben/dropbox/Chicago Booth/41100 Regressions/Homework 6")
 
 # First split the data into training and testing samples (size and sampling scheme is up to you).
 
-# a) Using the training data, build a model for log crime rate by using forward stepwise selection 
+# Import data
+crime <- read.csv("CommunityCrime.csv")
+
+# Add a variable for the log of the Violent Crime Rate
+crime$LogViolentCR <- log(crime$ViolentCR)
+
+# Set seed so the results are replicable 
+set.seed(9)
+
+# Select a random sample of rows
+samples <- sort(sample.int(nrow(crime), 0.80*nrow(crime)))
+
+# Subset the data into training and test datasets.
+crime.train <- crime[samples,] 
+crime.test <- crime[-samples,]
+
+# (a) Using the training data, build a model for log crime rate by using forward stepwise selection 
 # guided by both AIC and BIC to search through all main effects.
+
+# Create a null model with no independent variables
+null <- lm(LogViolentCR ~ 1, data=crime.train)
+
+# Create a full model with all the main effects. 
+# Remove the non-logged version of Violent CR as well as the community name varialbe
+full <- lm(LogViolentCR ~ . - communityname - ViolentCR, data=crime.train)
+
+# Create a model using forward stepwise selection
+crime.reg.AIC1 <- step(null, scope=formula(full), direction="forward", k=2)
+crime.reg.BIC1 <- step(null, scope=formula(full), direction="forward", k=log(nrow(crime.train)))
+
+
+
+# (b) Redo (a) allowing for all possible interactions. What has changed?
+
+# Create a full model with all the main effects and interactions
+# Remove the non-logged version of Violent CR as well as the community name varialbe
+# full <- lm(LogViolentCR ~ . + .^2, data=crime.train)
+
+# Create a model using forward stepwise selection
+crime.reg.AIC1 <- step(null, scope=formula(full), direction="forward", k=2)
+crime.reg.BIC1 <- step(null, scope=formula(full), direction="forward", k=log(nrow(crime.train)))
+
