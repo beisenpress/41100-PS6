@@ -21,20 +21,23 @@ setwd("/Users/ben/dropbox/Chicago Booth/41100 Regressions/Homework 6")
 # First split the data into training and testing samples (size and sampling scheme is up to you).
 
 # Import data
-crime <- read.csv("CommunityCrime.csv")
+crime.0 <- read.csv("CommunityCrime.csv")
 
 # Add a variable for the log of the Violent Crime Rate
-crime$LogViolentCR <- log(crime$ViolentCR)
+crime.0$LogViolentCR <- log(crime.0$ViolentCR)
+
+# Drop the community name and non-logged ViolentCR variables
+crime.1 <- crime.0[,c(-1,-2)]
 
 # Set seed so the results are replicable 
 set.seed(9)
 
 # Select a random sample of rows
-samples <- sort(sample.int(nrow(crime), 0.80*nrow(crime)))
+samples <- sort(sample.int(nrow(crime.1), 0.80*nrow(crime.1)))
 
 # Subset the data into training and test datasets.
-crime.train <- crime[samples,] 
-crime.test <- crime[-samples,]
+crime.train <- crime.1[samples,] 
+crime.test <- crime.1[-samples,]
 
 # (a) Using the training data, build a model for log crime rate by using forward stepwise selection 
 # guided by both AIC and BIC to search through all main effects.
@@ -61,4 +64,3 @@ crime.reg.BIC1 <- step(null, scope=formula(full), direction="forward", k=log(nro
 # Create a model using forward stepwise selection
 crime.reg.AIC1 <- step(null, scope=formula(full), direction="forward", k=2)
 crime.reg.BIC1 <- step(null, scope=formula(full), direction="forward", k=log(nrow(crime.train)))
-
