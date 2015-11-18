@@ -68,14 +68,15 @@ crime.reg.BIC2 <- step(null, scope=formula(full2), direction="forward", k=log(nr
 # install.packages("glmnet") #just run this once (on each computer)
 library(glmnet)
 
-# Create a training dataset without the independent variable
-crime.train.2 <- crime.train[,c(-26)]
+# Create a dataset without the independent variable
+# Use the full data, rather than training.  We will select the training data later
+crime.2 <- crime.1[,c(-26)]
 
-X <- model.matrix(~.^2, crime.train.2) 
+X <- model.matrix(~.^2, crime.2) 
 #need to subtract the intercept
 X <- X[,-1]
 
-cvfit <- cv.glmnet(x = X, y = crime.train$LogViolentCR, family="gaussian", alpha=1, standardize=FALSE)
+cvfit <- cv.glmnet(x = X[samples,], y = crime.train$LogViolentCR, family="gaussian", alpha=1, standardize=FALSE)
 
 betas <- coef(cvfit, s = "lambda.1se")
 model <- which(betas[2:length(betas)]!=0)
@@ -115,12 +116,18 @@ round(probs, 5)
 # (e) Use the test data to compare out-of-sample MSE performance. Compare your results with what 
 # you found in (d).
 
-# Calculate errors using the predict function
+# Calculate errors for all but LASSO using the predict function
 crime.error.AIC1 <- predict(crime.reg.AIC1, newdata=crime.test)-crime.test$LogViolentCR
 crime.error.BIC1 <- predict(crime.reg.BIC1, newdata=crime.test)-crime.test$LogViolentCR
 crime.error.AIC2 <- predict(crime.reg.AIC2, newdata=crime.test)-crime.test$LogViolentCR
 crime.error.BIC2 <- predict(crime.reg.BIC2, newdata=crime.test)-crime.test$LogViolentCR
-#crime.error.lasso <- predict(crime.reg.lasso, newdata=crime.test)-crime.test$LogViolentCR
+
+# Creat a data frame to to make predictions with LASSO
+refitting.data <- data.frame(crime.1$LogViolentCR, X[,model])
+names(refitting.data)[1] <- "LogViolentCR"
+
+# Calculate errors for LASSO using predict and the data frame
+crime.error.lasso <- predict(crime.reg.lasso, newdata=refitting.data[-samples,])-crime.test$LogViolentCR
 
 
 #comparing the errors
@@ -133,14 +140,8 @@ c(crime.mse.AIC1=mean(crime.error.AIC1^2), crime.mse.BIC1=mean(crime.error.BIC1^
 # (f) Use cv.glmnet to fit Ridge regression on all main effects and interactions. Compute the 
 # out- of-sample MSE and compare to (e). (You may want to consult ?predict.cv.glmnet.)
 
-# Create a training dataset without the independent variable
-crime.train.2 <- crime.train[,c(-26)]
-
-X <- model.matrix(~.^2, crime.train.2) 
-#need to subtract the intercept
-X <- X[,-1]
-
-cvfit2 <- cv.glmnet(x = X, y = crime.train$LogViolentCR, family="gaussian", alpha=0, standardize=FALSE)
+# Do cv.glmnet with alpha = 0 for ridge regression
+cvfit2 <- cv.glmnet(x = X[samples,], y = crime.train$LogViolentCR, family="gaussian", alpha=0, standardize=FALSE)
 
 betas2 <- coef(cvfit2, s = "lambda.1se")
 model2 <- which(betas2[2:length(betas2)]!=0)
@@ -151,3 +152,11 @@ model2 <- which(betas2[2:length(betas2)]!=0)
 crime.reg.ridge <- lm(crime.train$LogViolentCR ~ X[,model])
 
 summary(crime.reg.ridge)
+
+# Get prediction errors
+crime.error.ridge <- predict(crime.reg.ridge, newdata=refitting.data[-samples,])-crime.test$LogViolentCR
+
+#comparing the errors
+c(crime.mse.AIC1=mean(crime.error.AIC1^2), crime.mse.BIC1=mean(crime.error.BIC1^2), 
+  crime.mse.AIC2=mean(crime.error.AIC2^2), crime.mse.BIC2=mean(crime.error.BIC2^2), 
+  crime.mse.lasso=mean(crime.error.lasso^2), crime.mse.ridge=mean(crime.error.ridge^2))
