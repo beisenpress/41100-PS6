@@ -90,7 +90,7 @@ X <- X[,-1]
 cvfit.lasso <- cv.glmnet(x = X[samples,], y = crime.train$LogViolentCR, family="gaussian", alpha=1, standardize=FALSE)
 
 # Extract the Beta coefficients from the LASSO results.
-# Two options for the "s" paramater are lambda.1se" and "lambda.min" The lecture did not cover the difference.
+# Two options for the "s" paramater are lambda.1se" and "lambda.min."
 betas.lasso.1se <- coef(cvfit.lasso, s = "lambda.1se")
 
 # Get the column numbers of the non-zero beta coefficients.
