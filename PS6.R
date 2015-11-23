@@ -52,6 +52,9 @@ full <- lm(LogViolentCR ~ ., data=crime.train)
 crime.reg.AIC1 <- step(null, scope=formula(full), direction="forward", k=2)
 crime.reg.BIC1 <- step(null, scope=formula(full), direction="forward", k=log(nrow(crime.train)))
 
+summary(crime.reg.AIC1)
+summary(crime.reg.BIC1)
+
 
 # (b) Redo (a) allowing for all possible interactions. What has changed?
 
@@ -61,6 +64,10 @@ full2 <- lm(LogViolentCR ~ . + .^2, data=crime.train)
 # Create a model using forward stepwise selection
 crime.reg.AIC2 <- step(null, scope=formula(full2), direction="forward", k=2)
 crime.reg.BIC2 <- step(null, scope=formula(full2), direction="forward", k=log(nrow(crime.train)))
+
+summary(crime.reg.AIC2)
+summary(crime.reg.BIC2)
+
 
 # (c) Still within the training data, use the LASSO to select a model from all main effects and
 # interactions.
@@ -128,6 +135,28 @@ probs <- eBIC/sum(eBIC)
 round(probs, 5)
 
 # BIC says the regression from BIC forward stepwise selection has a 99% change of being right
+
+# Plot the fitted values against the residuals
+plot(crime.reg.AIC1$fitted.values, crime.reg.AIC1$residuals, main="AIC1 Fitted Values v Residuals",
+     xlab="Fitted Values", ylab = "Residuals", pch=20)
+abline(h=0, col = "red")
+
+plot(crime.reg.BIC1$fitted.values, crime.reg.BIC1$residuals, main="BIC1 Fitted Values v Residuals",
+     xlab="Fitted Values", ylab = "Residuals", pch=20)
+abline(h=0, col = "red")
+
+plot(crime.reg.AIC2$fitted.values, crime.reg.AIC2$residuals, main="AIC2 Fitted Values v Residuals",
+     xlab="Fitted Values", ylab = "Residuals", pch=20)
+abline(h=0, col = "red")
+
+plot(crime.reg.BIC2$fitted.values, crime.reg.BIC2$residuals, main="BIC2 Fitted Values v Residuals",
+     xlab="Fitted Values", ylab = "Residuals", pch=20)
+abline(h=0, col = "red")
+
+plot(crime.reg.lasso.1se$fitted.values, crime.reg.lasso.1se$residuals, main="LASSO Fitted Values v Residuals",
+     xlab="Fitted Values", ylab = "Residuals", pch=20)
+abline(h=0, col = "red")
+
 
 # (e) Use the test data to compare out-of-sample MSE performance. Compare your results with what 
 # you found in (d).
