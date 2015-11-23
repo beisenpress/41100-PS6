@@ -137,26 +137,20 @@ round(probs, 5)
 # BIC says the regression from BIC forward stepwise selection has a 99% change of being right
 
 # Plot the fitted values against the residuals
-plot(crime.reg.AIC1$fitted.values, crime.reg.AIC1$residuals, main="AIC1 Fitted Values v Residuals",
-     xlab="Fitted Values", ylab = "Residuals", pch=20)
-abline(h=0, col = "red")
+plot(crime.reg.AIC1$fitted.values,crime.reg.AIC1$residuals,ylab="Residuals",xlab="Fitted Values", main="AIC1 Fitted Values vs. Residuals")
+abline(h=0,col="red")
 
-plot(crime.reg.BIC1$fitted.values, crime.reg.BIC1$residuals, main="BIC1 Fitted Values v Residuals",
-     xlab="Fitted Values", ylab = "Residuals", pch=20)
-abline(h=0, col = "red")
+plot(crime.reg.BIC1$fitted.values, crime.reg.BIC1$residuals,ylab="Residuals",xlab="Fitted Values", main="BIC1 Fitted Values vs. Residuals")
+abline(h=0,col="red")
 
-plot(crime.reg.AIC2$fitted.values, crime.reg.AIC2$residuals, main="AIC2 Fitted Values v Residuals",
-     xlab="Fitted Values", ylab = "Residuals", pch=20)
-abline(h=0, col = "red")
+plot(crime.reg.AIC2$fitted.values, crime.reg.AIC2$residuals,ylab="Residuals",xlab="Fitted Values", main="AIC2 Fitted Values vs. Residuals")
+abline(h=0,col="red")
 
-plot(crime.reg.BIC2$fitted.values, crime.reg.BIC2$residuals, main="BIC2 Fitted Values v Residuals",
-     xlab="Fitted Values", ylab = "Residuals", pch=20)
-abline(h=0, col = "red")
+plot(crime.reg.BIC2$fitted.values, crime.reg.BIC2$residuals,ylab="Residuals",xlab="Fitted Values", main="BIC2 Fitted Values vs. Residuals")
+abline(h=0,col="red")
 
-plot(crime.reg.lasso.1se$fitted.values, crime.reg.lasso.1se$residuals, main="LASSO Fitted Values v Residuals",
-     xlab="Fitted Values", ylab = "Residuals", pch=20)
-abline(h=0, col = "red")
-
+plot(crime.reg.lasso.1se$fitted.values, crime.reg.lasso.1se$residuals,ylab="Residuals",xlab="Fitted Values", main="Lasso Fitted Values vs. Residuals")
+abline(h=0,col="red")  
 
 # (e) Use the test data to compare out-of-sample MSE performance. Compare your results with what 
 # you found in (d).
